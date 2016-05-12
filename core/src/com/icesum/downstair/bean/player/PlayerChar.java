@@ -12,6 +12,7 @@ import com.icesum.downstair.adapter.DownStairGame;
  * Created by Hei on 10/5/2016.
  */
 public class PlayerChar {
+    // TODO: scale the texture
     private static final int CHAR_WIDTH = 50;
     private static final int CHAR_Height = 50;
 
