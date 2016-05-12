@@ -26,8 +26,8 @@ public class Player extends PlayerChar {
         mLife = MAX_LIFE;
     }
 
-    public void addScore() {
-        mScore++;
+    public void setScore(int score) {
+        mScore = score;
     }
 
     public void resetScore() {

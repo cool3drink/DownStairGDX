@@ -1,7 +1,10 @@
 package com.icesum.downstair.ui.state;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.icesum.downstair.adapter.DownStairGame;
@@ -17,13 +20,19 @@ import java.util.Random;
 public class GameSinglePlayerState extends BaseState {
     private static final int STAIR_INIT_Y_POSITION = 200; // DO WE NEED?
     private static final int STAIR_MAX_NUM_COUNT = 10;
-    private static final int STAIR_SPACING_MIN = 70;
-    private static final int STAIR_SPACING_RANGE = 100;
+    private static final int STAIR_SPACING_MIN = 80;
+    private static final int STAIR_SPACING_RANGE = 120;
 
-    private float level;
+    // Level
+    private int level;
     private float speed;
-    private boolean isStairCollide;
+    private float distance;
+    private int levelUpDistance;
 
+    // Font
+    private BitmapFont font;
+
+    // Objects
     private Player player;
     private IntArray stairsGenKey;
     private Array<BaseStair> stairsActive;
@@ -31,9 +40,15 @@ public class GameSinglePlayerState extends BaseState {
     public GameSinglePlayerState(GameStateManager gsm) {
         super(gsm);
         mCamera.setToOrtho(false, DownStairGame.WIDTH, DownStairGame.HEIGHT);
-        isStairCollide = false;
+
+        // Level
         level = 1;
-        speed = 5;
+        levelUpDistance = 100;
+        speed = 3;
+        distance = 0;
+
+        // Font
+        font = new BitmapFont(Gdx.files.internal("Segoe_Print.fnt"));
 
         // Generate player
         player = new Player(50, 300, Player.FIRE_TYPE);
@@ -42,6 +57,14 @@ public class GameSinglePlayerState extends BaseState {
         stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
         stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
         initStairs(new int[]{7, 3});
+    }
+
+    private void initStairs(int[] genKey) {
+        stairsActive.clear();
+        setStairsGenKey(genKey);
+        for (int i=0; i<STAIR_MAX_NUM_COUNT; i++) {
+            genStair();
+        }
     }
 
     @Override
@@ -57,6 +80,29 @@ public class GameSinglePlayerState extends BaseState {
 
     @Override
     public void update(float dt) {
+        handleInput();
+        player.fall(dt);
+        updateLevel(dt);
+        updateStairs(dt);
+    }
+
+    private void updateLevel(float dt) {
+        distance += dt * speed;
+        //player.setScore((int) distance/10);
+        Gdx.app.log("Distance:", String.valueOf(distance));
+        if (distance > levelUpDistance) {
+            levelUpDistance += levelUpDistance*level;
+            speed += 1.5f;
+            level++;
+            Gdx.app.log("Speed:", String.valueOf(speed));
+            for (BaseStair stair : stairsActive) {
+                stair.setYSpeed(speed);
+            }
+        }
+    }
+
+    private void updateStairs(float dt) {
+        // Dispose stairs out of screen
         if (stairsActive.size!=0) {
             if (stairsActive.get(0).getY() > DownStairGame.HEIGHT) {
                 stairsActive.get(0).dispose();
@@ -64,24 +110,38 @@ public class GameSinglePlayerState extends BaseState {
                 genStair();
             }
         }
-        player.fall(dt);
-        for (BaseStair stair: stairsActive) {
+        for (BaseStair stair : stairsActive) {
             stair.update(dt);
             if (stair.isCollide(player.getBounds())) {
-                Gdx.app.log("GSPS", "isCollide");
                 stair.collideMotion(player);
             }
         }
-        handleInput();
     }
 
     @Override
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(mCamera.combined);
         sb.begin();
+        // Render player
         sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
+        // Render stairs
         renderStairs(sb);
+        // Render score
+        renderScore(sb);
         sb.end();
+    }
+
+    private void renderStairs(SpriteBatch sb) {
+        for (BaseStair stair: stairsActive) {
+            sb.draw(stair.getTexture(), stair.getX(), stair.getY(), stair.WIDTH, stair.HEIGHT);
+        }
+    }
+
+    private void renderScore(SpriteBatch sb) {
+        font.setColor(Color.RED);
+        font.getData().setScale(0.6f);
+        font.draw(sb, String.valueOf((int) distance), 450, 700, 0, Align.right, false);
+        font.draw(sb, "Lv.  "+String.valueOf(level), 450, 750, 0, Align.right, false);
     }
 
     @Override
@@ -92,14 +152,8 @@ public class GameSinglePlayerState extends BaseState {
         }
     }
 
-    private void initStairs(int[] genKey) {
-        stairsActive.clear();
-        setStairsGenKey(genKey);
-        for (int i=0; i<STAIR_MAX_NUM_COUNT; i++) {
-            genStair();
-        }
-    }
-
+    /*****     Generating Stairs     *****/
+    // Set generation key of stairs
     private void setStairsGenKey(int[] genKey) {
         stairsGenKey.clear();
         int sum = 0;
@@ -112,6 +166,9 @@ public class GameSinglePlayerState extends BaseState {
             stairsGenKey.add(sum);
         }
     }
+
+    // Patterns of generating stairs
+    //private void genStairScript() {}
 
     // Generate one stair
     private void genStair() {
@@ -138,9 +195,5 @@ public class GameSinglePlayerState extends BaseState {
         }
     }
 
-    private void renderStairs(SpriteBatch sb) {
-        for (BaseStair stair: stairsActive) {
-            sb.draw(stair.getTexture(), stair.getX(), stair.getY(), stair.WIDTH, stair.HEIGHT);
-        }
-    }
+
 }

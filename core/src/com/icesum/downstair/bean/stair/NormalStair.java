@@ -18,12 +18,11 @@ public class NormalStair extends BaseStair {
 
     @Override
     public void collideMotion(Player player) {
-        Gdx.app.log("NormalStair", "isCollide");
         // Stand On the stair
         if (player.getY() > mBounds.getY()) {
-            Gdx.app.log("NormalStair", "onAbove");
+            //Gdx.app.log("NormalStair", "onAbove");
+            player.setYSpeed(mVelocity.y);
             player.setY(mBounds.getY()+HEIGHT);
-            player.setYSpeed(0);
             player.updateBounds();
         }
     }

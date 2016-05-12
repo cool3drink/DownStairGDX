@@ -18,6 +18,6 @@ public class WaterStair extends BaseStair {
 
     @Override
     public void collideMotion(Player player) {
-        Gdx.app.log("WaterStair", "isCollide");
+        //Gdx.app.log("WaterStair", "isCollide");
     }
 }

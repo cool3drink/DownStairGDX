@@ -11,24 +11,23 @@ import java.util.Random;
  * Created by Hei on 11/5/2016.
  */
 public abstract class BaseStair {
-    // TODO: scale the texture
     public final static int WIDTH = 120;
     public final static int HEIGHT = 20;
 
     public static final int TOTAL_TYPE_COUNT = 2;
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_WATER = 1;
+    public static final int TYPE_GRASS = 2;
+    public static final int TYPE_FIRE = 3;
 
     //private Random rand;
-    private Vector2 mPosition;
-    private Vector2 mVelocity;
+    protected Vector2 mPosition;
+    protected Vector2 mVelocity;
     protected int type;
     protected Rectangle mBounds;
     protected Texture mTexture;
 
     public BaseStair(float x, float y, float y_speed) {
-        //rand = new Random();
-        //mPosition = new Vector2(rand.nextInt(), y);
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,y_speed);
     }
@@ -81,11 +80,11 @@ public abstract class BaseStair {
         mBounds.setPosition(mPosition.x, mPosition.y);
     }
 
-    public void setXSpeed(int x_speed) {
+    public void setXSpeed(float x_speed) {
         mVelocity.x = x_speed;
     }
 
-    public void setYSpeed(int y_speed) {
+    public void setYSpeed(float y_speed) {
         mVelocity.y = y_speed;
     }
 

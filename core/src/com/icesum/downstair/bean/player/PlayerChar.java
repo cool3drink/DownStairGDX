@@ -101,7 +101,8 @@ public class PlayerChar {
         }
         mVelocity.scl(dt);
         mPosition.add(0, mVelocity.y);
-        if (mPosition.y < 0) {
+        if (mPosition.y < -Player.CHAR_HEIGHT) {
+            // Dead
             mPosition.y = 0;
         }
         mVelocity.scl(1 / dt);
