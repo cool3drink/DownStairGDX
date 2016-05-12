@@ -16,16 +16,15 @@ import java.util.Random;
  */
 public class GameSinglePlayerState extends BaseState {
     private static final int STAIR_INIT_Y_POSITION = 200; // DO WE NEED?
-    private static final int STAIR_MAX_NUM_COUNT = 6;
-    private static final int STAIR_SPACING_MIN = 200;
-    private static final int STAIR_SPACING_RANGE = 200;
+    private static final int STAIR_MAX_NUM_COUNT = 10;
+    private static final int STAIR_SPACING_MIN = 70;
+    private static final int STAIR_SPACING_RANGE = 100;
 
     private float level;
     private float speed;
     private boolean isStairCollide;
 
     private Player player;
-    //private Array<BaseStair[]> stairs;
     private IntArray stairsGenKey;
     private Array<BaseStair> stairsActive;
 
@@ -41,9 +40,7 @@ public class GameSinglePlayerState extends BaseState {
 
         // Generate stairs
         stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
-        //stairs = new Array<BaseStair[]>(TOTAL_TYPE_COUNT);
         stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
-        //genStairs(new int[]{100});
         initStairs(new int[]{7, 3});
     }
 
@@ -76,14 +73,13 @@ public class GameSinglePlayerState extends BaseState {
             }
         }
         handleInput();
-        //
     }
 
     @Override
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(mCamera.combined);
         sb.begin();
-        sb.draw(player.getTexture(), player.getX(), player.getY());
+        sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
         renderStairs(sb);
         sb.end();
     }
@@ -105,8 +101,8 @@ public class GameSinglePlayerState extends BaseState {
     }
 
     private void setStairsGenKey(int[] genKey) {
-        int sum = 0;
         stairsGenKey.clear();
+        int sum = 0;
 
         for (int i=0; i<BaseStair.TOTAL_TYPE_COUNT; i++) {
             // Compute the discrete cumulative density function
@@ -144,7 +140,7 @@ public class GameSinglePlayerState extends BaseState {
 
     private void renderStairs(SpriteBatch sb) {
         for (BaseStair stair: stairsActive) {
-            sb.draw(stair.getTexture(), stair.getX(), stair.getY());
+            sb.draw(stair.getTexture(), stair.getX(), stair.getY(), stair.WIDTH, stair.HEIGHT);
         }
     }
 }
