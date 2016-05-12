@@ -3,6 +3,7 @@ package com.icesum.downstair.bean.stair;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.icesum.downstair.bean.player.Player;
 
 import java.util.Random;
 
@@ -14,7 +15,9 @@ public abstract class BaseStair {
     public final static int WIDTH = 150;
     public final static int HEIGHT = 30;
 
-    public static final int STAIR_TYPE_NORMAL = 0;
+    public static final int TOTAL_TYPE_COUNT = 2;
+    public static final int TYPE_NORMAL = 0;
+    public static final int TYPE_WATER = 1;
 
     //private Random rand;
     private Vector2 mPosition;
@@ -23,11 +26,22 @@ public abstract class BaseStair {
     protected Rectangle mBounds;
     protected Texture mTexture;
 
-    public BaseStair(int x, int y, int y_speed) {
+    public BaseStair(float x, float y, float y_speed) {
         //rand = new Random();
         //mPosition = new Vector2(rand.nextInt(), y);
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,y_speed);
+    }
+
+    public BaseStair(int stairType, float x, float y, float y_speed) {
+        switch (stairType) {
+            case BaseStair.TYPE_NORMAL:
+                new NormalStair(x, y, y_speed);
+                break;
+            case BaseStair.TYPE_WATER:
+                new WaterStair(x, y, y_speed);
+                break;
+        }
     }
 
     public void update(float dt) {
@@ -77,6 +91,25 @@ public abstract class BaseStair {
 
     public Texture getTexture() {
         return mTexture;
+    }
+
+    /*****     Collision Checking     *****/
+    public boolean isCollide(Rectangle player) {
+        return mBounds.overlaps(player);
+    }
+
+    /*****     Abstract  Methods     *****/
+    public abstract void collideMotion(Player player);
+
+    /*****     Static Methods     *****/
+    public static BaseStair getStair(int stairType, float x, float y, float y_speed) {
+        switch (stairType) {
+            case BaseStair.TYPE_NORMAL:
+                return new NormalStair(x, y, y_speed);
+            case BaseStair.TYPE_WATER:
+                return new WaterStair(x, y, y_speed);
+        }
+        return null;
     }
 
 }

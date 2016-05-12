@@ -32,10 +32,6 @@ public class PlayerChar {
         mBounds = new Rectangle(x, y, mTexture.getWidth(), mTexture.getHeight());
     }
 
-    public void update(float dt) {
-        fall(dt);
-    }
-
     public void dispose() {
         mTexture.dispose();
     }
@@ -68,17 +64,39 @@ public class PlayerChar {
         return mTexture;
     }
 
+    public void setVelocity(float vx, float vy) {
+        mVelocity.set(vx, vy);
+    }
+
+    public void setXSpeed(float vx) {
+        mVelocity.x = vx;
+    }
+
+    public void setYSpeed(float vy) {
+        mVelocity.y = vy;
+    }
+
+    public void setX(float x) {
+        mPosition.x = x;
+    }
+
+    public void setY(float y) {
+        mPosition.y = y;
+    }
+
     /*****     Motion     *****/
     public void moveLeft(float dt) {
         if (mPosition.x > 0) {
             mPosition.x -= 10;
         }
+        updateBounds();
     }
 
     public void moveRight(float dt) {
         if (mPosition.x + mTexture.getWidth() < DownStairGame.WIDTH) {
             mPosition.x += 10;
         }
+        updateBounds();
     }
 
     public void fall(float dt) {
@@ -91,5 +109,6 @@ public class PlayerChar {
             mPosition.y = 0;
         }
         mVelocity.scl(1 / dt);
+        updateBounds();
     }
 }
