@@ -4,6 +4,9 @@ package com.icesum.downstair.bean.player;
  * Created by Hei on 10/5/2016.
  */
 public class Player extends PlayerChar {
+    public static final int CHAR_WIDTH = 50;
+    public static final int CHAR_HEIGHT = 50;
+
     public static final int FIRE_TYPE = 0;
     public static final int WATER_TYPE = 1;
     public static final int GRASS_TYPE = 2;
@@ -31,9 +34,7 @@ public class Player extends PlayerChar {
         mScore = 0;
     }
 
-    public void subLife() {
-
-    }
+    public void subLife() {}
 
     public int getPlayerType() {
         return mCharType;

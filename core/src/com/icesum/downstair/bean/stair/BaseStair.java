@@ -12,8 +12,8 @@ import java.util.Random;
  */
 public abstract class BaseStair {
     // TODO: scale the texture
-    public final static int WIDTH = 150;
-    public final static int HEIGHT = 30;
+    public final static int WIDTH = 120;
+    public final static int HEIGHT = 20;
 
     public static final int TOTAL_TYPE_COUNT = 2;
     public static final int TYPE_NORMAL = 0;

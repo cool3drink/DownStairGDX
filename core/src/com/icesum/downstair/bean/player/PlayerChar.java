@@ -12,10 +12,6 @@ import com.icesum.downstair.adapter.DownStairGame;
  * Created by Hei on 10/5/2016.
  */
 public class PlayerChar {
-    // TODO: scale the texture
-    private static final int CHAR_WIDTH = 50;
-    private static final int CHAR_Height = 50;
-
     private static final int GRAVITY = -15;
 
     private Vector2 mPosition;
@@ -29,7 +25,7 @@ public class PlayerChar {
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,0);
         mTexture = new Texture("bg_char_fire.png");
-        mBounds = new Rectangle(x, y, mTexture.getWidth(), mTexture.getHeight());
+        mBounds = new Rectangle(x, y, Player.CHAR_WIDTH, Player.CHAR_HEIGHT);
     }
 
     public void dispose() {
@@ -45,11 +41,11 @@ public class PlayerChar {
     }
 
     public float getWidth() {
-        return mTexture.getWidth();
+        return Player.CHAR_WIDTH;
     }
 
     public float getHeight() {
-        return mTexture.getHeight();
+        return Player.CHAR_HEIGHT;
     }
 
     public Rectangle getBounds() {
@@ -93,7 +89,7 @@ public class PlayerChar {
     }
 
     public void moveRight(float dt) {
-        if (mPosition.x + mTexture.getWidth() < DownStairGame.WIDTH) {
+        if (mPosition.x + Player.CHAR_WIDTH < DownStairGame.WIDTH) {
             mPosition.x += 10;
         }
         updateBounds();
