@@ -18,10 +18,15 @@ import java.util.Random;
  * Created by Hei on 10/5/2016.
  */
 public class GameSinglePlayerState extends BaseState {
-    private static final int STAIR_INIT_Y_POSITION = 200; // DO WE NEED?
+    private static final int PLAYER_INIT_Y_POSITION = 700;
+
+    private static final int STAIR_INIT_Y_POSITION = 200;
     private static final int STAIR_MAX_NUM_COUNT = 10;
     private static final int STAIR_SPACING_MIN = 80;
     private static final int STAIR_SPACING_RANGE = 120;
+
+    // Game state
+    private boolean isGameOver;
 
     // Level
     private int level;
@@ -41,22 +46,26 @@ public class GameSinglePlayerState extends BaseState {
         super(gsm);
         mCamera.setToOrtho(false, DownStairGame.WIDTH, DownStairGame.HEIGHT);
 
+        // Game state
+        isGameOver = false;
+
         // Level
         level = 1;
         levelUpDistance = 100;
-        speed = 3;
+        speed = 5;
         distance = 0;
 
         // Font
         font = new BitmapFont(Gdx.files.internal("Segoe_Print.fnt"));
 
         // Generate player
-        player = new Player(50, 300, Player.FIRE_TYPE);
+        int playerInitXPosition = (int) Math.random()*(DownStairGame.WIDTH-Player.CHAR_WIDTH);
+        player = new Player(playerInitXPosition, PLAYER_INIT_Y_POSITION, Player.FIRE_TYPE);
 
         // Generate stairs
         stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
         stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
-        initStairs(new int[]{7, 3});
+        initStairs(new int[]{0,0,0,0,1,1}); // Size of array must be larger than TOTAL_TYPE_COUNT
     }
 
     private void initStairs(int[] genKey) {
@@ -75,25 +84,44 @@ public class GameSinglePlayerState extends BaseState {
             } else {
                 player.moveRight(0);
             }
+        } else {
+            player.setXSpeed(0);
         }
     }
 
     @Override
     public void update(float dt) {
         handleInput();
+        // Gravity
         player.fall(dt);
-        updateLevel(dt);
-        updateStairs(dt);
+
+        if (!isGameOver) {
+            updateLevel(dt);
+            updateStairs(dt);
+        }
+        updatePlayer(dt);
+    }
+
+    private void updatePlayer(float dt) {
+        if (player.getY() < (-Player.CHAR_HEIGHT)) {
+            // TODO: Dead Condition
+            //Gdx.app.log("updatePlayer", "Dead");
+            if (!isGameOver) {
+                player.setYSpeed(20);
+            }
+            isGameOver = true;
+        }
+        player.update(dt);
     }
 
     private void updateLevel(float dt) {
         distance += dt * speed;
         //player.setScore((int) distance/10);
-        Gdx.app.log("Distance:", String.valueOf(distance));
+        //Gdx.app.log("Distance:", String.valueOf(distance));
         if (distance > levelUpDistance) {
-            levelUpDistance += levelUpDistance*level;
             speed += 1.5f;
             level++;
+            levelUpDistance = levelUpDistance*(level+1);
             Gdx.app.log("Speed:", String.valueOf(speed));
             for (BaseStair stair : stairsActive) {
                 stair.setYSpeed(speed);
@@ -112,8 +140,11 @@ public class GameSinglePlayerState extends BaseState {
         }
         for (BaseStair stair : stairsActive) {
             stair.update(dt);
+        }
+        for (BaseStair stair : stairsActive) {
             if (stair.isCollide(player.getBounds())) {
                 stair.collideMotion(player);
+                break;
             }
         }
     }
@@ -122,12 +153,12 @@ public class GameSinglePlayerState extends BaseState {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(mCamera.combined);
         sb.begin();
-        // Render player
-        sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
         // Render stairs
         renderStairs(sb);
         // Render score
-        renderScore(sb);
+        renderLevel(sb);
+        // Render player
+        sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
         sb.end();
     }
 
@@ -137,7 +168,7 @@ public class GameSinglePlayerState extends BaseState {
         }
     }
 
-    private void renderScore(SpriteBatch sb) {
+    private void renderLevel(SpriteBatch sb) {
         font.setColor(Color.RED);
         font.getData().setScale(0.6f);
         font.draw(sb, String.valueOf((int) distance), 450, 700, 0, Align.right, false);
@@ -176,7 +207,7 @@ public class GameSinglePlayerState extends BaseState {
         int pick;
 
         pick = rand.nextInt(stairsGenKey.peek());
-        Gdx.app.log("Pick", String.valueOf(pick));
+        //Gdx.app.log("Pick", String.valueOf(pick));
         for (int j=0; j<BaseStair.TOTAL_TYPE_COUNT; j++) {    // j indicates the stair type
             if (pick<stairsGenKey.get(j)) {
                 // Generate a stair with random spacing

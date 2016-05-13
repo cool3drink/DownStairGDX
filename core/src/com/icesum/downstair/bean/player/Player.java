@@ -20,7 +20,6 @@ public class Player extends PlayerChar {
 
     public Player(int x, int y, int char_type) {
         super(x, y);
-        //mPlayerChar = new PlayerChar(x, y);
         mCharType = char_type;
         mScore = 0;
         mLife = MAX_LIFE;

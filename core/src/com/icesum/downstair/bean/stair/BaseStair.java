@@ -11,14 +11,16 @@ import java.util.Random;
  * Created by Hei on 11/5/2016.
  */
 public abstract class BaseStair {
-    public final static int WIDTH = 120;
-    public final static int HEIGHT = 20;
+    public static final int WIDTH = 120;
+    public static final int HEIGHT = 20;
 
-    public static final int TOTAL_TYPE_COUNT = 2;
+    public static final int TOTAL_TYPE_COUNT = 6;
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_WATER = 1;
     public static final int TYPE_GRASS = 2;
     public static final int TYPE_FIRE = 3;
+    public static final int TYPE_GO_LEFT = 4;
+    public static final int TYPE_GO_RIGHT = 5;
 
     //private Random rand;
     protected Vector2 mPosition;
@@ -32,20 +34,9 @@ public abstract class BaseStair {
         mVelocity = new Vector2(0,y_speed);
     }
 
-    public BaseStair(int stairType, float x, float y, float y_speed) {
-        switch (stairType) {
-            case BaseStair.TYPE_NORMAL:
-                new NormalStair(x, y, y_speed);
-                break;
-            case BaseStair.TYPE_WATER:
-                new WaterStair(x, y, y_speed);
-                break;
-        }
-    }
-
     public void update(float dt) {
         mPosition.add(mVelocity);
-        mBounds.setPosition(mPosition.x, mPosition.y);
+        updateBounds();
     }
 
     public void dispose() {
@@ -103,10 +94,18 @@ public abstract class BaseStair {
     /*****     Static Methods     *****/
     public static BaseStair getStair(int stairType, float x, float y, float y_speed) {
         switch (stairType) {
-            case BaseStair.TYPE_NORMAL:
+            case TYPE_NORMAL:
                 return new NormalStair(x, y, y_speed);
-            case BaseStair.TYPE_WATER:
+            case TYPE_WATER:
                 return new WaterStair(x, y, y_speed);
+            case TYPE_GRASS:
+                return new GrassStair(x, y, y_speed);
+            case TYPE_FIRE:
+                return new FireStair(x, y, y_speed);
+            case TYPE_GO_LEFT:
+                return new GoLeftStair(x, y, y_speed);
+            case TYPE_GO_RIGHT:
+                return new GoRightStair(x, y, y_speed);
         }
         return null;
     }

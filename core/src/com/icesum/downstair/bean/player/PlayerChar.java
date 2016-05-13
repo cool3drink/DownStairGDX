@@ -12,7 +12,7 @@ import com.icesum.downstair.adapter.DownStairGame;
  * Created by Hei on 10/5/2016.
  */
 public class PlayerChar {
-    private static final int GRAVITY = -15;
+    private static final int GRAVITY = -20;
 
     private Vector2 mPosition;
     private Vector2 mVelocity;
@@ -38,6 +38,14 @@ public class PlayerChar {
 
     public float getY() {
         return mPosition.y;
+    }
+
+    public float getXSpeed() {
+        return mVelocity.x;
+    }
+
+    public float getYSpeed() {
+        return mVelocity.y;
     }
 
     public float getWidth() {
@@ -68,8 +76,16 @@ public class PlayerChar {
         mVelocity.x = vx;
     }
 
+    public void addXSpeed(float vx) {
+        mVelocity.x += vx;
+    }
+
     public void setYSpeed(float vy) {
         mVelocity.y = vy;
+    }
+
+    public void addYSpeed(float vy) {
+        mVelocity.y += vy;
     }
 
     public void setX(float x) {
@@ -80,32 +96,30 @@ public class PlayerChar {
         mPosition.y = y;
     }
 
-    /*****     Motion     *****/
-    public void moveLeft(float dt) {
-        if (mPosition.x > 0) {
-            mPosition.x -= 10;
+    public void update(float dt) {
+        mPosition.add(mVelocity.x, mVelocity.y);
+        if (mPosition.x < 0) {
+            mPosition.x = 0;
+        }
+        if (mPosition.x + Player.CHAR_WIDTH > DownStairGame.WIDTH) {
+            mPosition.x = DownStairGame.WIDTH - Player.CHAR_WIDTH;
         }
         updateBounds();
+    }
+
+    /*****     Motion     *****/
+    public void moveLeft(float dt) {
+        setXSpeed(-10);
     }
 
     public void moveRight(float dt) {
-        if (mPosition.x + Player.CHAR_WIDTH < DownStairGame.WIDTH) {
-            mPosition.x += 10;
-        }
-        updateBounds();
+        setXSpeed(10);
     }
 
     public void fall(float dt) {
-        if (mPosition.y > 0) {
-            mVelocity.add(0, GRAVITY);
-        }
-        mVelocity.scl(dt);
-        mPosition.add(0, mVelocity.y);
-        if (mPosition.y < -Player.CHAR_HEIGHT) {
-            // Dead
-            mPosition.y = 0;
-        }
-        mVelocity.scl(1 / dt);
-        updateBounds();
+        mVelocity.add(0, GRAVITY*dt);
+        //mVelocity.scl(dt);
+        //mPosition.add(0, mVelocity.y*dt);
+        //mVelocity.scl(1 / dt);
     }
 }
