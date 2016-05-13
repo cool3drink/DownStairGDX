@@ -33,9 +33,27 @@ public class Player extends PlayerChar {
         mScore = 0;
     }
 
-    public void subLife() {}
+    public void addLife() {
+        if (mLife < MAX_LIFE) {
+            mLife++;
+        }
+    }
 
-    public int getPlayerType() {
+    public void subLife() {
+        if (mLife > 0) {
+            mLife--;
+        }
+    }
+
+    public void resetLife() {
+        mLife = 0;
+    }
+
+    public int getLife() {
+        return mLife;
+    }
+
+    public int getType() {
         return mCharType;
     }
 }

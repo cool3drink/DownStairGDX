@@ -27,8 +27,6 @@ public class GameSinglePlayerState extends BaseState {
 
     // Game state
     private boolean isGameOver;
-
-    // Level
     private int level;
     private float speed;
     private float distance;
@@ -48,8 +46,6 @@ public class GameSinglePlayerState extends BaseState {
 
         // Game state
         isGameOver = false;
-
-        // Level
         level = 1;
         levelUpDistance = 100;
         speed = 5;
@@ -65,7 +61,7 @@ public class GameSinglePlayerState extends BaseState {
         // Generate stairs
         stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
         stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
-        initStairs(new int[]{0,0,0,0,1,1}); // Size of array must be larger than TOTAL_TYPE_COUNT
+        initStairs(new int[]{8,1,1,1,2,2}); // Size of array must be larger than TOTAL_TYPE_COUNT
     }
 
     private void initStairs(int[] genKey) {
@@ -91,11 +87,11 @@ public class GameSinglePlayerState extends BaseState {
 
     @Override
     public void update(float dt) {
-        handleInput();
         // Gravity
         player.fall(dt);
 
         if (!isGameOver) {
+            handleInput();
             updateLevel(dt);
             updateStairs(dt);
         }
@@ -103,9 +99,11 @@ public class GameSinglePlayerState extends BaseState {
     }
 
     private void updatePlayer(float dt) {
-        if (player.getY() < (-Player.CHAR_HEIGHT)) {
-            // TODO: Dead Condition
+        // TODO: Dead Event
+        if (    (player.getY() < (-Player.CHAR_HEIGHT)) ||
+                (player.getLife() <= 0)) {
             //Gdx.app.log("updatePlayer", "Dead");
+            player.resetLife();
             if (!isGameOver) {
                 player.setYSpeed(20);
             }
@@ -156,7 +154,7 @@ public class GameSinglePlayerState extends BaseState {
         // Render stairs
         renderStairs(sb);
         // Render score
-        renderLevel(sb);
+        renderGameState(sb);
         // Render player
         sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
         sb.end();
@@ -168,11 +166,12 @@ public class GameSinglePlayerState extends BaseState {
         }
     }
 
-    private void renderLevel(SpriteBatch sb) {
+    private void renderGameState(SpriteBatch sb) {
         font.setColor(Color.RED);
         font.getData().setScale(0.6f);
-        font.draw(sb, String.valueOf((int) distance), 450, 700, 0, Align.right, false);
-        font.draw(sb, "Lv.  "+String.valueOf(level), 450, 750, 0, Align.right, false);
+        font.draw(sb, String.valueOf((int) distance), 450, 680, 0, Align.right, false);
+        font.draw(sb, "Lv.  "+String.valueOf(level), 450, 730, 0, Align.right, false);
+        font.draw(sb, "Life  "+String.valueOf(player.getLife()), 450, 780, 0, Align.right, false);
     }
 
     @Override
