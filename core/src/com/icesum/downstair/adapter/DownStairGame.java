@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.icesum.downstair.ui.state.GameSinglePlayerState;
 import com.icesum.downstair.ui.state.GameStateManager;
 import com.icesum.downstair.ui.state.HomeState;
+import com.icesum.downstair.ui.state.HelloState;
 
 public class DownStairGame extends ApplicationAdapter {
 
@@ -27,7 +28,9 @@ public class DownStairGame extends ApplicationAdapter {
         batch = new SpriteBatch();
         Gdx.gl.glClearColor(1, 1, 1, 0);
         // TODO: change initial sate here
-        gsm.push(new GameSinglePlayerState(gsm));
+        gsm.push(new HelloState(gsm));
+        //gsm.push(new HomeState(gsm));
+        //gsm.push(new GameSinglePlayerState(gsm));
 	}
 
 	@Override
