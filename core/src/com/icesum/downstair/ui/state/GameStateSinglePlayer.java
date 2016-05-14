@@ -222,7 +222,7 @@ public class GameStateSinglePlayer extends BaseGameState {
         // Render score
         renderGameState(sb);
         // Render player
-        sb.draw(player.getTexture(), player.getX(), player.getY(), player.CHAR_WIDTH, player.CHAR_HEIGHT);
+        sb.draw(player.getTexture(), player.getX(), player.getY(), Player.CHAR_WIDTH, Player.CHAR_HEIGHT);
         sb.end();
     }
 
