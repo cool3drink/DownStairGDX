@@ -11,7 +11,7 @@ public class RankState extends BaseState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(float dt) {
 
     }
 

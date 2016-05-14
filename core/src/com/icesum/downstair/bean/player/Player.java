@@ -7,9 +7,9 @@ public class Player extends PlayerChar {
     public static final int CHAR_WIDTH = 50;
     public static final int CHAR_HEIGHT = 50;
 
-    public static final int FIRE_TYPE = 0;
-    public static final int WATER_TYPE = 1;
-    public static final int GRASS_TYPE = 2;
+    public static final int TYPE_FIRE = 0;
+    public static final int TYPE_WATER = 1;
+    public static final int TYPE_GRASS = 2;
 
     public static final int MAX_LIFE = 3;
 
@@ -40,13 +40,17 @@ public class Player extends PlayerChar {
     }
 
     public void subLife() {
-        if (mLife > 0) {
-            mLife--;
-        }
+        mLife--;
     }
 
-    public void resetLife() {
+    public boolean isDead() {
+        return isFallOut() || mLife <= 0;
+    }
+
+    public void dead() {
         mLife = 0;
+        setXSpeed(0);
+        setYSpeed(15);
     }
 
     public int getLife() {

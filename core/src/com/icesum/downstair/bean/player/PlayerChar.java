@@ -12,7 +12,8 @@ import com.icesum.downstair.adapter.DownStairGame;
  * Created by Hei on 10/5/2016.
  */
 public class PlayerChar {
-    private static final int GRAVITY = -20;
+    private static final int GRAVITY = -15;
+    private static final float MOVE_SPEED = 100;
 
     private Vector2 mPosition;
     private Vector2 mVelocity;
@@ -98,6 +99,7 @@ public class PlayerChar {
 
     public void update(float dt) {
         mPosition.add(mVelocity.x, mVelocity.y);
+        // Check bounds
         if (mPosition.x < 0) {
             mPosition.x = 0;
         }
@@ -109,11 +111,19 @@ public class PlayerChar {
 
     /*****     Motion     *****/
     public void moveLeft(float dt) {
-        setXSpeed(-10);
+        setXSpeed(-MOVE_SPEED*dt);
     }
 
     public void moveRight(float dt) {
-        setXSpeed(10);
+        setXSpeed(MOVE_SPEED*dt);
+    }
+
+    public void stand() {
+        setXSpeed(0);
+    }
+
+    public boolean isFallOut() {
+        return getY() < (-Player.CHAR_HEIGHT);
     }
 
     public void fall(float dt) {

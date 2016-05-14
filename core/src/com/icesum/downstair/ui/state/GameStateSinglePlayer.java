@@ -1,6 +1,7 @@
 package com.icesum.downstair.ui.state;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,16 +18,24 @@ import java.util.Random;
 /**
  * Created by Hei on 10/5/2016.
  */
-public class GameSinglePlayerState extends BaseState {
+public class GameStateSinglePlayer extends BaseGameState {
     private static final int PLAYER_INIT_Y_POSITION = 700;
 
     private static final int STAIR_INIT_Y_POSITION = 200;
-    private static final int STAIR_MAX_NUM_COUNT = 10;
+    private static final int STAIR_MAX_NUM_COUNT = 7;
     private static final int STAIR_SPACING_MIN = 80;
     private static final int STAIR_SPACING_RANGE = 120;
 
+    private static final int GAME_STATE_READY = 0;
+    private static final int GAME_STATE_PLAYING = 1;
+    private static final int GAME_STATE_GAMEOVER = 2;
+
+    private static final int INPUT_FROM_SCREEN = 0;
+    private static final int INPUT_FROM_ACC_METER = 1;
+
     // Game state
-    private boolean isGameOver;
+    //private boolean isGameOver;
+    private int gameState;
     private int level;
     private float speed;
     private float distance;
@@ -40,28 +49,40 @@ public class GameSinglePlayerState extends BaseState {
     private IntArray stairsGenKey;
     private Array<BaseStair> stairsActive;
 
-    public GameSinglePlayerState(GameStateManager gsm) {
+    // Setting
+    private int inputMethod;
+    private float accMeterSensitive;
+
+    public GameStateSinglePlayer(GameStateManager gsm) {
         super(gsm);
         mCamera.setToOrtho(false, DownStairGame.WIDTH, DownStairGame.HEIGHT);
 
         // Game state
-        isGameOver = false;
+        gameState = GAME_STATE_READY;
         level = 1;
         levelUpDistance = 100;
-        speed = 5;
+        speed = 3;
         distance = 0;
 
         // Font
         font = new BitmapFont(Gdx.files.internal("Segoe_Print.fnt"));
 
         // Generate player
-        int playerInitXPosition = (int) Math.random()*(DownStairGame.WIDTH-Player.CHAR_WIDTH);
-        player = new Player(playerInitXPosition, PLAYER_INIT_Y_POSITION, Player.FIRE_TYPE);
+        int playerInitXPosition = (int) (Math.random()*(DownStairGame.WIDTH-Player.CHAR_WIDTH));
+        player = new Player(playerInitXPosition, PLAYER_INIT_Y_POSITION, Player.TYPE_FIRE);
 
         // Generate stairs
         stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
         stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
         initStairs(new int[]{8,1,1,1,2,2}); // Size of array must be larger than TOTAL_TYPE_COUNT
+
+        // Ssettings
+        if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)) {
+            inputMethod = INPUT_FROM_ACC_METER;
+            accMeterSensitive = 0.3f;
+        } else {
+            inputMethod = INPUT_FROM_SCREEN;
+        }
     }
 
     private void initStairs(int[] genKey) {
@@ -73,42 +94,89 @@ public class GameSinglePlayerState extends BaseState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(float dt) {
+        switch (inputMethod) {
+            case INPUT_FROM_ACC_METER:
+                handleInputAccMeter(dt);
+                break;
+            default:
+                handleInputScreen(dt);
+        }
+    }
+
+    private void handleInputScreen(float dt) {
+        switch (gameState) {
+            case GAME_STATE_READY:
+                break;
+            case GAME_STATE_PLAYING:
+                if (Gdx.input.isTouched()) {
+                    float acc = Gdx.input.getX() - Gdx.graphics.getWidth() / 2;
+                    player.moveRight(acc / 1000);
+                } else {
+                    player.stand();
+                }
+                break;
+            case GAME_STATE_GAMEOVER:
+                handleStateTransfer();
+                break;
+        }
+    }
+
+    private void handleInputAccMeter(float dt) {
+        switch (gameState) {
+            case GAME_STATE_READY:
+                break;
+            case GAME_STATE_PLAYING:
+                float acc = Gdx.input.getAccelerometerX();
+                if (Math.abs(acc) > accMeterSensitive) {
+                    player.moveLeft(acc * dt);
+                } else {
+                    player.stand();
+                }
+                break;
+            case GAME_STATE_GAMEOVER:
+                handleStateTransfer();
+                break;
+        }
+    }
+
+    private void handleStateTransfer() {
         if (Gdx.input.isTouched()) {
-            if (Gdx.input.getX() < (Gdx.graphics.getWidth() / 2)) {
-                player.moveLeft(0);
-            } else {
-                player.moveRight(0);
-            }
-        } else {
-            player.setXSpeed(0);
+            Gdx.graphics.setContinuousRendering(true);
+            mGameStateManager.set(new GameStateSinglePlayer(mGameStateManager));
         }
     }
 
     @Override
     public void update(float dt) {
-        // Gravity
-        player.fall(dt);
+        handleInput(dt);
 
-        if (!isGameOver) {
-            handleInput();
-            updateLevel(dt);
-            updateStairs(dt);
+        switch (gameState) {
+            case GAME_STATE_READY:
+                gameState = GAME_STATE_PLAYING;
+                break;
+            case GAME_STATE_PLAYING:
+                updateLevel(dt);
+                updateStairs(dt);
+                updatePlayer(dt);
+                break;
+            case GAME_STATE_GAMEOVER:
+                if (!player.isFallOut()) {
+                    player.fall(dt);
+                    player.update(dt);
+                } else {
+                    Gdx.graphics.setContinuousRendering(false);
+                }
+                break;
         }
-        updatePlayer(dt);
     }
 
     private void updatePlayer(float dt) {
-        // TODO: Dead Event
-        if (    (player.getY() < (-Player.CHAR_HEIGHT)) ||
-                (player.getLife() <= 0)) {
-            //Gdx.app.log("updatePlayer", "Dead");
-            player.resetLife();
-            if (!isGameOver) {
-                player.setYSpeed(20);
-            }
-            isGameOver = true;
+        if (player.isDead()) {
+            player.dead();
+            gameState = GAME_STATE_GAMEOVER;
         }
+        player.fall(dt);
         player.update(dt);
     }
 
@@ -129,19 +197,17 @@ public class GameSinglePlayerState extends BaseState {
 
     private void updateStairs(float dt) {
         // Dispose stairs out of screen
-        if (stairsActive.size!=0) {
-            if (stairsActive.get(0).getY() > DownStairGame.HEIGHT) {
-                stairsActive.get(0).dispose();
-                stairsActive.removeIndex(0);
-                genStair();
-            }
+        if (stairsActive.get(0).getY() > DownStairGame.HEIGHT) {
+            stairsActive.get(0).dispose();
+            stairsActive.removeIndex(0);
+            genStair();
         }
         for (BaseStair stair : stairsActive) {
             stair.update(dt);
         }
         for (BaseStair stair : stairsActive) {
-            if (stair.isCollide(player.getBounds())) {
-                stair.collideMotion(player);
+            if (stair.isHit(player.getBounds())) {
+                stair.hitMotion(player);
                 break;
             }
         }

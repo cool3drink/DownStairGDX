@@ -32,6 +32,7 @@ public abstract class BaseStair {
     public BaseStair(float x, float y, float y_speed) {
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,y_speed);
+        mBounds = new Rectangle(x, y, WIDTH, HEIGHT);
     }
 
     public void update(float dt) {
@@ -84,12 +85,12 @@ public abstract class BaseStair {
     }
 
     /*****     Collision Checking     *****/
-    public boolean isCollide(Rectangle player) {
+    public boolean isHit(Rectangle player) {
         return mBounds.overlaps(player);
     }
 
     /*****     Abstract  Methods     *****/
-    public abstract void collideMotion(Player player);
+    public abstract void hitMotion(Player player);
 
     /*****     Static Methods     *****/
     public static BaseStair getStair(int stairType, float x, float y, float y_speed) {

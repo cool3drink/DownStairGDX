@@ -13,12 +13,11 @@ public class GoLeftStair extends BaseStair {
     public GoLeftStair(float x, float y, float y_speed) {
         super(x, y, y_speed);
         mTexture = new Texture("bg_stair_go_left.png");
-        mBounds = new Rectangle(x, y, WIDTH, HEIGHT);
         type = BaseStair.TYPE_GO_LEFT;
     }
 
     @Override
-    public void collideMotion(Player player) {
+    public void hitMotion(Player player) {
         // Stand On the stair
         // Second condition is for high speed mode. If we don't use it, player with go through the stair
         if (player.getY() > mBounds.getY() || (-player.getYSpeed())+mVelocity.y > HEIGHT) {

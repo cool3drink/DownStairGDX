@@ -11,7 +11,7 @@ public class MenuState extends BaseState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(float dt) {
 
     }
 
