@@ -24,12 +24,14 @@ public class HelloState extends BaseState {
 
     @Override
     public void handleInput(float dt) {
-
+        if (Gdx.input.isTouched()) {
+            mGameStateManager.set(new HomeState(mGameStateManager));
+        }
     }
 
     @Override
     public void update(float dt) {
-
+        handleInput(dt);
     }
 
     @Override
