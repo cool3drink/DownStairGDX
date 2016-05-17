@@ -2,6 +2,7 @@ package com.icesum.downstair.ui.state;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,7 +39,7 @@ public class GameStateSinglePlayer extends BaseGameState {
     private int gameState;
     private int level;
     private float speed;
-    private float distance;
+    //private float distance;
     private int levelUpDistance;
 
     // Font
@@ -50,6 +51,7 @@ public class GameStateSinglePlayer extends BaseGameState {
     private Array<BaseStair> stairsActive;
 
     // Setting
+    Preferences prefs;
     private int inputMethod;
     private float accMeterSensitive;
 
@@ -57,32 +59,32 @@ public class GameStateSinglePlayer extends BaseGameState {
         super(gsm);
         mCamera.setToOrtho(false, DownStairGame.WIDTH, DownStairGame.HEIGHT);
 
-        // Game state
-        gameState = GAME_STATE_READY;
-        level = 1;
-        levelUpDistance = 100;
-        speed = 3;
-        distance = 0;
-
-        // Font
-        font = new BitmapFont(Gdx.files.internal("Segoe_Print.fnt"));
-
-        // Generate player
-        int playerInitXPosition = (int) (Math.random()*(DownStairGame.WIDTH-Player.CHAR_WIDTH));
-        player = new Player(playerInitXPosition, PLAYER_INIT_Y_POSITION, Player.TYPE_FIRE);
-
-        // Generate stairs
-        stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
-        stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
-        initStairs(new int[]{8,1,1,1,2,2}); // Size of array must be larger than TOTAL_TYPE_COUNT
-
-        // Ssettings
+        // Settings
+        prefs = Gdx.app.getPreferences("data_player");
         if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)) {
             inputMethod = INPUT_FROM_ACC_METER;
             accMeterSensitive = 0.3f;
         } else {
             inputMethod = INPUT_FROM_SCREEN;
         }
+
+        // Game state
+        gameState = GAME_STATE_READY;
+        level = 1;
+        levelUpDistance = 100;
+        speed = 3;
+
+        // Font
+        font = new BitmapFont(Gdx.files.internal("Segoe_Print.fnt"));
+
+        // Generate player
+        int playerInitXPosition = (int) (Math.random()*(DownStairGame.WIDTH-Player.CHAR_WIDTH));
+        player = new Player(playerInitXPosition, PLAYER_INIT_Y_POSITION, prefs.getInteger("type"));
+
+        // Generate stairs
+        stairsGenKey = new IntArray(BaseStair.TOTAL_TYPE_COUNT);
+        stairsActive = new Array<BaseStair>(STAIR_MAX_NUM_COUNT);
+        initStairs(new int[]{8, 1, 1, 1, 2, 2}); // Size of array must be larger than TOTAL_TYPE_COUNT
     }
 
     private void initStairs(int[] genKey) {
@@ -142,8 +144,8 @@ public class GameStateSinglePlayer extends BaseGameState {
 
     private void handleStateTransfer() {
         if (Gdx.input.isTouched()) {
-            Gdx.graphics.setContinuousRendering(true);
-            mGameStateManager.set(new GameStateSinglePlayer(mGameStateManager));
+            //Gdx.graphics.setContinuousRendering(true);
+            mGameStateManager.set(new HomeState(mGameStateManager));
         }
     }
 
@@ -165,7 +167,7 @@ public class GameStateSinglePlayer extends BaseGameState {
                     player.fall(dt);
                     player.update(dt);
                 } else {
-                    Gdx.graphics.setContinuousRendering(false);
+                    //Gdx.graphics.setContinuousRendering(false);
                 }
                 break;
         }
@@ -181,10 +183,10 @@ public class GameStateSinglePlayer extends BaseGameState {
     }
 
     private void updateLevel(float dt) {
-        distance += dt * speed;
+        player.addScore(dt * speed);
         //player.setScore((int) distance/10);
         //Gdx.app.log("Distance:", String.valueOf(distance));
-        if (distance > levelUpDistance) {
+        if (player.getScore() > levelUpDistance) {
             speed += 1.5f;
             level++;
             levelUpDistance = levelUpDistance*(level+1);
@@ -235,7 +237,7 @@ public class GameStateSinglePlayer extends BaseGameState {
     private void renderGameState(SpriteBatch sb) {
         font.setColor(Color.RED);
         font.getData().setScale(0.6f);
-        font.draw(sb, String.valueOf((int) distance), 450, 680, 0, Align.right, false);
+        font.draw(sb, String.valueOf((int) player.getScore()), 450, 680, 0, Align.right, false);
         font.draw(sb, "Lv.  "+String.valueOf(level), 450, 730, 0, Align.right, false);
         font.draw(sb, "Life  "+String.valueOf(player.getLife()), 450, 780, 0, Align.right, false);
     }

@@ -22,11 +22,21 @@ public class PlayerChar {
     private Texture mTexture;
     //private Sound mSound;
 
-    public PlayerChar(int x, int y) {
+    public PlayerChar(int x, int y, int char_type) {
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,0);
-        mTexture = new Texture("bg_char_fire.png");
         mBounds = new Rectangle(x, y, Player.CHAR_WIDTH, Player.CHAR_HEIGHT);
+        switch (char_type) {
+            case Player.TYPE_WATER:
+                mTexture = new Texture("bg_char_water.png");
+                break;
+            case Player.TYPE_FIRE:
+                mTexture = new Texture("bg_char_fire.png");
+                break;
+            case Player.TYPE_GRASS:
+                mTexture = new Texture("bg_char_grass.png");
+                break;
+        }
     }
 
     public void dispose() {

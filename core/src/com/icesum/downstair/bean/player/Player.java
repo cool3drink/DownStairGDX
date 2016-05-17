@@ -1,5 +1,7 @@
 package com.icesum.downstair.bean.player;
 
+import com.badlogic.gdx.graphics.Texture;
+
 /**
  * Created by Hei on 10/5/2016.
  */
@@ -15,22 +17,27 @@ public class Player extends PlayerChar {
 
     //private PlayerChar mPlayerChar;
     private int mCharType;
-    private int mScore;
+    private float mScore;
     private int mLife;
+    private String mPlayerName;
 
     public Player(int x, int y, int char_type) {
-        super(x, y);
+        super(x, y, char_type);
         mCharType = char_type;
         mScore = 0;
         mLife = MAX_LIFE;
     }
 
-    public void setScore(int score) {
-        mScore = score;
+    public void addScore(float plusScore) {
+        mScore += plusScore;
     }
 
-    public void resetScore() {
+    public void setScore(float score) {
         mScore = 0;
+    }
+
+    public float getScore() {
+        return mScore;
     }
 
     public void addLife() {
