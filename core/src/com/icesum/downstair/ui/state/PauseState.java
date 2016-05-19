@@ -11,7 +11,7 @@ public class PauseState extends BaseState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(float dt) {
 
     }
 

@@ -12,10 +12,8 @@ import com.icesum.downstair.adapter.DownStairGame;
  * Created by Hei on 10/5/2016.
  */
 public class PlayerChar {
-    private static final int CHAR_WIDTH = 50;
-    private static final int CHAR_Height = 50;
-
     private static final int GRAVITY = -15;
+    private static final float MOVE_SPEED = 100;
 
     private Vector2 mPosition;
     private Vector2 mVelocity;
@@ -24,15 +22,21 @@ public class PlayerChar {
     private Texture mTexture;
     //private Sound mSound;
 
-    public PlayerChar(int x, int y) {
+    public PlayerChar(int x, int y, int char_type) {
         mPosition = new Vector2(x,y);
         mVelocity = new Vector2(0,0);
-        mTexture = new Texture("bg_char_fire.png");
-        mBounds = new Rectangle(x, y, mTexture.getWidth(), mTexture.getHeight());
-    }
-
-    public void update(float dt) {
-        fall(dt);
+        mBounds = new Rectangle(x, y, Player.CHAR_WIDTH, Player.CHAR_HEIGHT);
+        switch (char_type) {
+            case Player.TYPE_WATER:
+                mTexture = new Texture("bg_char_water.png");
+                break;
+            case Player.TYPE_FIRE:
+                mTexture = new Texture("bg_char_fire.png");
+                break;
+            case Player.TYPE_GRASS:
+                mTexture = new Texture("bg_char_grass.png");
+                break;
+        }
     }
 
     public void dispose() {
@@ -47,12 +51,20 @@ public class PlayerChar {
         return mPosition.y;
     }
 
+    public float getXSpeed() {
+        return mVelocity.x;
+    }
+
+    public float getYSpeed() {
+        return mVelocity.y;
+    }
+
     public float getWidth() {
-        return mTexture.getWidth();
+        return Player.CHAR_WIDTH;
     }
 
     public float getHeight() {
-        return mTexture.getHeight();
+        return Player.CHAR_HEIGHT;
     }
 
     public Rectangle getBounds() {
@@ -67,28 +79,67 @@ public class PlayerChar {
         return mTexture;
     }
 
+    public void setVelocity(float vx, float vy) {
+        mVelocity.set(vx, vy);
+    }
+
+    public void setXSpeed(float vx) {
+        mVelocity.x = vx;
+    }
+
+    public void addXSpeed(float vx) {
+        mVelocity.x += vx;
+    }
+
+    public void setYSpeed(float vy) {
+        mVelocity.y = vy;
+    }
+
+    public void addYSpeed(float vy) {
+        mVelocity.y += vy;
+    }
+
+    public void setX(float x) {
+        mPosition.x = x;
+    }
+
+    public void setY(float y) {
+        mPosition.y = y;
+    }
+
+    public void update(float dt) {
+        mPosition.add(mVelocity.x, mVelocity.y);
+        // Check bounds
+        if (mPosition.x < 0) {
+            mPosition.x = 0;
+        }
+        if (mPosition.x + Player.CHAR_WIDTH > DownStairGame.WIDTH) {
+            mPosition.x = DownStairGame.WIDTH - Player.CHAR_WIDTH;
+        }
+        updateBounds();
+    }
+
     /*****     Motion     *****/
     public void moveLeft(float dt) {
-        if (mPosition.x > 0) {
-            mPosition.x -= 10;
-        }
+        setXSpeed(-MOVE_SPEED*dt);
     }
 
     public void moveRight(float dt) {
-        if (mPosition.x + mTexture.getWidth() < DownStairGame.WIDTH) {
-            mPosition.x += 10;
-        }
+        setXSpeed(MOVE_SPEED*dt);
+    }
+
+    public void stand() {
+        setXSpeed(0);
+    }
+
+    public boolean isFallOut() {
+        return getY() < (-Player.CHAR_HEIGHT);
     }
 
     public void fall(float dt) {
-        if (mPosition.y > 0) {
-            mVelocity.add(0, GRAVITY);
-        }
-        mVelocity.scl(dt);
-        mPosition.add(0, mVelocity.y);
-        if (mPosition.y < 0) {
-            mPosition.y = 0;
-        }
-        mVelocity.scl(1 / dt);
+        mVelocity.add(0, GRAVITY*dt);
+        //mVelocity.scl(dt);
+        //mPosition.add(0, mVelocity.y*dt);
+        //mVelocity.scl(1 / dt);
     }
 }

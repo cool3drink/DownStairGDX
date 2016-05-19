@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /**
  * Created by Hei on 10/5/2016.
  */
-public class GameMultiPlayerState extends BaseState {
-    public GameMultiPlayerState(GameStateManager gsm) {
+public class GameStateMultiPlayer extends BaseGameState {
+    public GameStateMultiPlayer(GameStateManager gsm) {
         super(gsm);
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(float dt) {
 
     }
 

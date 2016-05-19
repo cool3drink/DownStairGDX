@@ -20,7 +20,7 @@ public abstract class BaseState {
         mMouse = new Vector2();
     }
 
-    public abstract void handleInput();
+    public abstract void handleInput(float dt);
     public abstract void update(float dt);
     public abstract void render(SpriteBatch sb);
     public abstract void dispose();
