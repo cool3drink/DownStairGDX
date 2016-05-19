@@ -13,7 +13,7 @@ public class TextureButton {
 
     public TextureButton(Texture texture, float x, float y, float width, float height) {
         skin = new Sprite(texture);
-        skin.setPosition(x, y);
+        skin.setPosition(x, y-height);
         skin.setSize(width, height);
     }
 

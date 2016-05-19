@@ -29,23 +29,26 @@ public class HomeState extends BaseState {
         charWaterT = new Texture("bg_char_water.png");
         charFireT = new Texture("bg_char_fire.png");
         charGrassT = new Texture("bg_char_grass.png");
-        charWater = new TextureButton(charWaterT, 0, DownStairGame.HEIGHT/2, DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
-        charFire = new TextureButton(charFireT, DownStairGame.WIDTH/3,DownStairGame.HEIGHT/2,DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
-        charGrass = new TextureButton(charGrassT, DownStairGame.WIDTH/3*2, DownStairGame.HEIGHT/2,DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
+        charWater = new TextureButton(charWaterT, 0, DownStairGame.HEIGHT/4, DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
+        charFire = new TextureButton(charFireT, DownStairGame.WIDTH/3,DownStairGame.HEIGHT/4,DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
+        charGrass = new TextureButton(charGrassT, DownStairGame.WIDTH/3*2, DownStairGame.HEIGHT/4,DownStairGame.WIDTH/4,DownStairGame.WIDTH/4);
         prefs = Gdx.app.getPreferences("data_player");
     }
 
     @Override
     public void handleInput(float dt) {
         if (Gdx.input.isTouched()) {
-            if (charWater.isClicked(Gdx.input.getX(), Gdx.input.getY())) {
+            if (charWater.isClicked(Gdx.input.getX(), DownStairGame.HEIGHT - Gdx.input.getY())) {
                 prefs.putInteger("type", Player.TYPE_WATER);
+                prefs.flush();
                 mGameStateManager.set(new GameStateSinglePlayer(mGameStateManager));
-            } else if (charFire.isClicked(Gdx.input.getX(), Gdx.input.getY())) {
+            } else if (charFire.isClicked(Gdx.input.getX(), DownStairGame.HEIGHT - Gdx.input.getY())) {
                 prefs.putInteger("type", Player.TYPE_FIRE);
+                prefs.flush();
                 mGameStateManager.set(new GameStateSinglePlayer(mGameStateManager));
-            } else if (charGrass.isClicked(Gdx.input.getX(), Gdx.input.getY())) {
+            } else if (charGrass.isClicked(Gdx.input.getX(), DownStairGame.HEIGHT - Gdx.input.getY())) {
                 prefs.putInteger("type", Player.TYPE_GRASS);
+                prefs.flush();
                 mGameStateManager.set(new GameStateSinglePlayer(mGameStateManager));
             }
         }

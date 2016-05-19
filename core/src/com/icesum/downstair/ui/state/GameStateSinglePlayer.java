@@ -20,40 +20,8 @@ import java.util.Random;
  * Created by Hei on 10/5/2016.
  */
 public class GameStateSinglePlayer extends BaseGameState {
-    private static final int PLAYER_INIT_Y_POSITION = 700;
-
-    private static final int STAIR_INIT_Y_POSITION = 200;
-    private static final int STAIR_MAX_NUM_COUNT = 7;
-    private static final int STAIR_SPACING_MIN = 80;
-    private static final int STAIR_SPACING_RANGE = 120;
-
-    private static final int GAME_STATE_READY = 0;
-    private static final int GAME_STATE_PLAYING = 1;
-    private static final int GAME_STATE_GAMEOVER = 2;
-
-    private static final int INPUT_FROM_SCREEN = 0;
-    private static final int INPUT_FROM_ACC_METER = 1;
-
-    // Game state
-    //private boolean isGameOver;
-    private int gameState;
-    private int level;
-    private float speed;
-    //private float distance;
-    private int levelUpDistance;
-
     // Font
     private BitmapFont font;
-
-    // Objects
-    private Player player;
-    private IntArray stairsGenKey;
-    private Array<BaseStair> stairsActive;
-
-    // Setting
-    Preferences prefs;
-    private int inputMethod;
-    private float accMeterSensitive;
 
     public GameStateSinglePlayer(GameStateManager gsm) {
         super(gsm);
@@ -163,12 +131,8 @@ public class GameStateSinglePlayer extends BaseGameState {
                 updatePlayer(dt);
                 break;
             case GAME_STATE_GAMEOVER:
-                if (!player.isFallOut()) {
-                    player.fall(dt);
-                    player.update(dt);
-                } else {
-                    //Gdx.graphics.setContinuousRendering(false);
-                }
+                player.fall(dt);
+                player.update(dt);
                 break;
         }
     }
